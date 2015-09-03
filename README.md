@@ -1,2 +1,2 @@
 # wearable-server
-Control server to bracelets
+Control server to wearables
