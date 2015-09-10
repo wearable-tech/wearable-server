@@ -9,9 +9,19 @@ end
 
 get '/test' do
   # access url like localhost:4567/test?v1=1&v2=2
-  f = File.new("test.txt", "w")
+  f = File.new("test.txt", "a")
   f.puts("writing...")
+  f.puts("params: #{params}")
   f.close
 
   "#{params} #{ params.size} #{params['v2']}"
+end
+
+post '/methodPost' do
+  f = File.new("post.txt", "a")
+  f.puts("writing post...")
+  f.puts("params: #{params}")
+  f.close
+
+  "params: #{params}"
 end
