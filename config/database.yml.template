@@ -1,0 +1,7 @@
+host: 'localhost'
+adapter: 'postgresql'
+database: 'wearable'
+username: ''
+password: ''
+encoding: 'utf8'
+pool: 5
