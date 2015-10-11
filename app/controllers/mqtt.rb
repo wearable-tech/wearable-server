@@ -41,6 +41,6 @@ MQTT::Client.connect(conn_opts) do |c|
   # publish a message to the topic 'test'
   loop do
     c.publish('test', 'Hello World')
-    sleep 2
+    sleep 10
   end
 end
