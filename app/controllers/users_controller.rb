@@ -7,27 +7,27 @@ post '/user/save' do
 end
 
 post '/user/get' do
-  user = User.find_by_email params["email"]
-  result = "fail"
-
-  if user and user.password == params["password"]
-    result = "user found"
+  begin
+    user = User.find_by_email params["email"]
+  rescue
+    return "user not found"
   end
 
-  result
+  user.password == params["password"] ? "user found" : "user not found"
 end
 
 post '/user/add_contact' do
-  user = User.find params["id"]
-
-  unless user.nil?
-    user_contact = User.find_by_email params["email"]
-      unless user_contact.nil?
-        Contact.create level: params["level"], user_id: user.id, contact_id: user_contact.id
-        "contact created"
-        return
-      end
+  begin
+    user = User.find params["id"]
+  rescue
+    return "user not found"
   end
 
-  "fail"
+  begin
+    user_contact = User.find_by_email params["email"]
+    Contact.create level: params["level"], user_id: user.id, contact_id: user_contact.id
+    "contact created"
+  rescue
+    "contact not found"
+  end
 end

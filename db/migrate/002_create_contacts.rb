@@ -1,9 +1,9 @@
 class CreateContacts < ActiveRecord::Migration
   def change
     create_table :contacts do |t|
+      t.references :user
+      t.references :contact
       t.integer :level
-      t.integer :user_id
-      t.integer :contact_id
     end
   end
 end
