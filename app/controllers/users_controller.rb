@@ -10,17 +10,17 @@ post '/user/get' do
   begin
     user = User.find_by_email params["email"]
   rescue
-    return "user not found"
+    return "fail"
   end
 
-  user.password == params["password"] ? "user found" : "user not found"
+  user.password == params["password"] ? "user found" : "fail"
 end
 
 post '/user/add_contact' do
   begin
     user = User.find params["id"]
   rescue
-    return "user not found"
+    return "fail"
   end
 
   begin
@@ -28,6 +28,6 @@ post '/user/add_contact' do
     Contact.create level: params["level"], user_id: user.id, contact_id: user_contact.id
     "contact created"
   rescue
-    "contact not found"
+    "fail"
   end
 end
