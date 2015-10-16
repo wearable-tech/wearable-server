@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 require './arnorails.rb'
 
 post '/user/save' do
@@ -7,13 +8,13 @@ post '/user/save' do
 end
 
 post '/user/get' do
-  begin
-    user = User.find_by_email params["email"]
-  rescue
-    return "fail"
-  end
+  user = User.find_by_email params["email"]
 
-  user.password == params["password"] ? "user found" : "fail"
+  if user
+    "user found" if user.password == params["password"]
+  else
+    "fail"
+  end
 end
 
 post '/user/add_contact' do
@@ -29,5 +30,24 @@ post '/user/add_contact' do
     "contact created"
   rescue
     "fail"
+  end
+end
+
+post '/user/contacts.json' do
+  user = User.find_by_email params["email"]
+
+  if user
+    contacts = Contact.find_all_by_user_id user.id
+    content_type :json
+      contacts_json = contacts.map do |c|
+        email = User.find(c.contact_id).email
+
+        {email: email, level: c.level}
+      end
+
+      contacts_json.to_json
+  else
+    content_type :json
+      "fail".to_json
   end
 end
