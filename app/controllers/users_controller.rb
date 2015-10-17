@@ -18,19 +18,27 @@ post '/user/get' do
 end
 
 post '/user/add_contact' do
-  begin
-    user = User.find params["id"]
-  rescue
-    return "fail"
+  user = User.find_by_email params["user_email"]
+
+  if user
+    user_contact = User.find_by_email params["contact_email"]
+
+    if user_contact
+      contact = Contact.find_by_user_id_and_contact_id user.id, user_contact.id
+
+      if contact
+        contact.level = params["contact_level"]
+      else
+        contact = Contact.new(user_id: user.id,
+          contact_id: user_contact.id, level: params["contact_level"])
+      end
+
+      contact.save
+      return "contact saved"
+    end
   end
 
-  begin
-    user_contact = User.find_by_email params["email"]
-    Contact.create level: params["level"], user_id: user.id, contact_id: user_contact.id
-    "contact created"
-  rescue
-    "fail"
-  end
+  "fail"
 end
 
 post '/user/contacts.json' do
