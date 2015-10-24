@@ -46,11 +46,14 @@ post '/user/contacts.json' do
 
   if user
     contacts = Contact.find_all_by_user_id user.id
+    
     content_type :json
       contacts_json = contacts.map do |c|
-        email = User.find(c.contact_id).email
+        contact = User.find(c.contact_id)
+        email = contact.email
+        name = contact.name
 
-        {email: email, level: c.level}
+        {name: name, email: email, level: c.level}
       end
 
       contacts_json.to_json
