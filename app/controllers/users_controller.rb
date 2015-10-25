@@ -91,3 +91,17 @@ post '/user/delete_contact' do
     "fail"
   end
 end
+
+post '/user/delete_contact' do
+  user = User.find_by_email params['email_user']
+  contact = User.find_by_email params['email_contact']
+  user.id.to_s + " " + contact.id.to_s
+  id = Contact.find_by_sql ["SELECT id FROM contacts WHERE user_id = ? AND contact_id = ?", user.id, contact.id]
+  con = Contact.find(id)
+  if con
+    con[0].delete
+    "contact removed"
+  else
+    "fail"
+  end
+end
