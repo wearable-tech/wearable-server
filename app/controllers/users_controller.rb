@@ -3,18 +3,21 @@ require 'json'
 require './arnorails.rb'
 
 post '/user/save' do
-  User.create email: params["email"], password: params["password"]
+  User.create name: params["name"], email: params["email"], password: params["password"], level: 0
   "user created"
 end
 
-post '/user/get' do
+post '/user/get.json' do
   user = User.find_by_email params["email"]
 
   if user
-    "user found" if user.password == params["password"]
-  else
-    "fail"
+    if user.password == params["password"]
+      content_type :json
+        return [{name: user.name, email: user.email, password: user.password, level: user.level}].to_json
+    end
   end
+
+  "fail".to_json
 end
 
 post '/user/add_contact' do
