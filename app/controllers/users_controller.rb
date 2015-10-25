@@ -65,3 +65,16 @@ post '/user/contacts.json' do
       "fail".to_json
   end
 end
+
+post '/user/define_level' do
+  user = User.find_by_email params["email"]
+
+  if user
+    user.level = params["level"]
+    user.save
+
+    "level changed"
+  else
+    "fail"
+  end
+end
