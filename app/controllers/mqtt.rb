@@ -1,6 +1,7 @@
 require 'mqtt'
 require 'uri'
 require 'geocoder'
+require './arnorails.rb'
 
 # Create a hash with the connection parameters from the URL
 uri = URI.parse 'mqtt://localhost:1883'
@@ -10,6 +11,19 @@ conn_opts = {
   username: uri.user,
   password: uri.password,
 }
+
+users = User.all
+users.each do |user|
+  puts "Therad: #{user.email}"
+  Thread.new do
+    MQTT::Client.connect(conn_opts) do |c|
+      # The block will be called when you messages arrive to the topic
+      c.get(user.email) do |topic, message|
+        puts "#{topic}: #{message}"
+      end
+    end
+  end
+end
 
 Thread.new do
   MQTT::Client.connect(conn_opts) do |c|
@@ -31,7 +45,7 @@ Thread.new do
         puts first_result.address
         puts "***************************************"
       else
-        puts "A localização foi 0.0,0.0"
+        puts "A localização foi Indefinida"
       end
     end
   end
