@@ -20,6 +20,15 @@ users.each do |user|
       # The block will be called when you messages arrive to the topic
       c.get(user.email) do |topic, message|
         puts "#{topic}: #{message}"
+
+        params = message.split(",")
+        print params
+        latitude = params[0].to_f
+        longitude = params[1].to_f
+        oxygenation = params[2].to_f
+        pulse = params[3].to_f
+
+        Measurement.create(user_id: user.id, blood_oxygenation: oxygenation, pulse_rate: pulse)
       end
     end
   end
@@ -54,7 +63,7 @@ end
 MQTT::Client.connect(conn_opts) do |c|
   # publish a message to the topic 'test'
   loop do
-    c.publish('test', 'Hello World')
+    c.publish('test', '12,-23,21.2,80')
     sleep 10
   end
 end
