@@ -3,14 +3,15 @@ require 'uri'
 require 'geocoder'
 require './arnorails.rb'
 
-# Create a hash with the connection parameters from the URL
-uri = URI.parse 'mqtt://localhost:1883'
-conn_opts = {
-  remote_host: uri.host,
-  remote_port: uri.port,
-  username: uri.user,
-  password: uri.password,
-}
+def connection
+  uri = URI.parse 'mqtt://localhost:1883'
+  conn_opts = {
+    remote_host: uri.host,
+    remote_port: uri.port,
+    username: uri.user,
+    password: uri.password,
+  }
+end
 
 def save_location(user, latitude, longitude)
   if latitude == 0 and longitude == 0
@@ -30,12 +31,13 @@ def save_location(user, latitude, longitude)
   Geocoder.search("#{latitude},#{longitude}").first.address
 end
 
-users = User.all
-users.each do |user|
+def init_subscribe(email)
+  user = User.find_by_email email
+
   Thread.new do
-    MQTT::Client.connect(conn_opts) do |c|
-      # The block will be called when you messages arrive to the topic
-      c.get(user.email) do |topic, message|
+    puts "Doing subscribe to #{email}"
+    MQTT::Client.connect(connection) do |c|
+      c.get(email) do |topic, message|
         puts "#{topic}: #{message}"
 
         params = message.split(",")
@@ -51,10 +53,26 @@ users.each do |user|
   end
 end
 
-MQTT::Client.connect(conn_opts) do |c|
-  # publish a message to the topic 'test'
-  loop do
-    c.publish('admin@a.com', '0,0,0,0')
-    sleep 2
+def init_connection
+  Thread.new do
+    MQTT::Client.connect(connection) do |c|
+      c.get("new_connection") do |topic, message|
+        puts "new connection to #{message}"
+        init_subscribe message
+      end
+    end
   end
 end
+
+def do_publish
+  MQTT::Client.connect(connection) do |c|
+    loop do
+      puts "Doing publish to admin@a.com"
+      c.publish('admin@a.com', '0,0,0,0')
+      sleep 5
+    end
+  end
+end
+
+init_connection
+do_publish
