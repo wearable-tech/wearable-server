@@ -86,4 +86,19 @@ def init_connection
   end
 end
 
+def init_server
+  puts "Init server..."
+  Thread.new do
+    sleep 5
+    users = User.all
+
+    users.each do |user|
+      MQTT::Client.connect(connection) do |c|
+        c.publish("new_connection", user.email)
+      end
+    end
+  end
+end
+
+init_server
 init_connection
