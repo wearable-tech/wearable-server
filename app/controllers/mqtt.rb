@@ -43,11 +43,11 @@ end
 def verify_notification(user, measurement)
   if measurement.oxygen_level > 0
     send_notification(user.email, measurement.oxygen_level,
-        "O nível oxigenação do(a) #{user.name} é #{measurement.blood_oxygenation}")
+      "O nível oxigenação do(a) #{user.name} é #{measurement.blood_oxygenation}")
   end
   if measurement.pulse_level > 0
     send_notification(user.email, measurement.pulse_level,
-        "A frequência cardíaca do(a) #{user.name} é #{measurement.pulse_rate}")
+      "A frequência cardíaca do(a) #{user.name} é #{measurement.pulse_rate}")
   end
 end
 
