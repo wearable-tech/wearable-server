@@ -110,3 +110,9 @@ post '/user/delete_contact' do
 
   "fail"
 end
+
+post '/user/delete' do
+  user = User.find_by_email params['email_user']
+  user.delete
+  "contact removed"
+end
