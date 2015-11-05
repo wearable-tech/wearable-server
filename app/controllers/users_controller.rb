@@ -3,8 +3,13 @@ require 'json'
 require './arnorails.rb'
 
 post '/user/save' do
-  User.create name: params["name"], email: params["email"], password: params["password"], level: 0
-  "user created"
+  user = User.new name: params["name"], email: params["email"], password: params["password"], level: 0
+  if user.valid?
+    user.save
+    "user created"
+  else
+    "fail"
+  end
 end
 
 post '/user/get.json' do

@@ -6,12 +6,16 @@ class User < ActiveRecord::Base
   has_many :contacts
   has_many :users, source: :contact, through: :contacts
 
+  validates :name, presence: true
+  validates :password, presence: true
+  validates :email, uniqueness: true
+
   after_create :send_to_mqtt
   
   def send_to_mqtt
     MQTT::Client.connect(connection) do |c|
-        c.publish("new_connection", email)
-      end
+      c.publish("new_connection", email)
+    end
   end
 
   def connection
