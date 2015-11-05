@@ -25,6 +25,17 @@ post '/user/get.json' do
   "fail".to_json
 end
 
+post '/user/update' do
+  user = User.find_by_email params["current_email"]
+  print params
+  user.name = params["name"]
+  user.email = params["new_email"]
+  user.level = params["level"]
+  user.password = params["password"] if params["password"]
+  user.save
+  "user updated"
+end
+
 post '/user/add_contact' do
   user = User.find_by_email params["user_email"]
 
