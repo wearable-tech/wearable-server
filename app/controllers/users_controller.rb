@@ -112,7 +112,18 @@ post '/user/delete_contact' do
 end
 
 post '/user/delete' do
-  user = User.find_by_email params['email_user']
-  user.delete
-  "contact removed"
+  user = User.find_by_email params['email']
+
+  if user
+    contacts = Contact.find_all_by_contact_id user.id
+
+    contacts.each do |c|
+      c.delete
+    end
+
+    user.delete
+    return "contact removed"
+  end
+
+  "fail"
 end
