@@ -34,20 +34,34 @@ end
 def send_notification(email, level, message)
     for i in level..3
       MQTT::Client.connect(connection) do |c|
-        puts "to_#{email}_#{i}: #{message}"
         c.publish("to_#{email}_#{i}", message)
       end
     end
 end
 
-def verify_notification(user, measurement)
-  if measurement.oxygen_level > 0
-    send_notification(user.email, measurement.oxygen_level,
-      "O nível oxigenação do(a) #{user.name} é #{measurement.blood_oxygenation}")
+def build_notification(user, measurement)
+  level = 0
+
+  if measurement.oxygen_level > 0 or measurement.pulse_level > 0
+    values = []
+    values << measurement.oxygen_level if measurement.oxygen_level > 0
+    values << measurement.pulse_level if measurement.pulse_level > 0
+    level = values.min
   end
-  if measurement.pulse_level > 0
-    send_notification(user.email, measurement.pulse_level,
-      "A frequência cardíaca do(a) #{user.name} é #{measurement.pulse_rate}")
+
+  message = "Valores para #{user.name}:\n\n"
+
+  message += "Oxigenação Sanguínea "
+  message += (measurement.oxygen_level > 0 ? "com problemas " : "regular ")
+  message += "valor: #{measurement.blood_oxygenation}\n\n"
+
+  message += "Frequência Cardíaca "
+  message += (measurement.pulse_level > 0 ? "com problemas " : "regular ")
+  message += "valor: #{measurement.pulse_rate}\n"
+
+  puts "Result Message:\n#{message}"
+  if level > 0
+    send_notification user.email, level, message
   end
 end
 
@@ -71,7 +85,7 @@ def init_subscribe(email)
 
         puts save_location(user, latitude, longitude)
 
-        verify_notification(user, measurement)
+        build_notification(user, measurement)
       end
     end
   end
