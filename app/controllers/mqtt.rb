@@ -39,7 +39,7 @@ def send_notification(email, level, message)
     end
 end
 
-def build_notification(user, measurement)
+def build_notification(user, measurement, location)
   level = 0
 
   if measurement.oxygen_level > 0 or measurement.pulse_level > 0
@@ -57,7 +57,10 @@ def build_notification(user, measurement)
 
   message += "Frequência Cardíaca "
   message += (measurement.pulse_level > 0 ? "com problemas " : "regular ")
-  message += "valor: #{measurement.pulse_rate}\n"
+  message += "valor: #{measurement.pulse_rate}\n\n"
+
+  date = measurement.created_at.strftime("%d/%m/%Y - %H:%M")
+  message += "#{location}\n#{date}"
 
   puts "Result Message:\n#{message}"
   if level > 0
@@ -83,9 +86,9 @@ def init_subscribe(email)
         measurement = Measurement.create(user_id: user.id, blood_oxygenation: oxygenation,
           pulse_rate: pulse)
 
-        puts save_location(user, latitude, longitude)
+        location = save_location(user, latitude, longitude)
 
-        build_notification(user, measurement)
+        build_notification(user, measurement, location)
       end
     end
   end
